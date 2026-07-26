@@ -11,9 +11,9 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[#0B0F19] text-white">
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-10">
 
-        <Hero />
+        <Hero currentGame={currentGame} />
 
         <LiveStatus
           currentGame={currentGame}
@@ -21,21 +21,16 @@ export default async function Home() {
           streamLive={streamLive}
         />
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        {/* Mobile: Join Battle first
+            Desktop: Queue left, Join Battle right */}
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 md:gap-8">
 
-          <div className="bg-gray-900/90 rounded-3xl border border-orange-500/30 p-8">
-            <h2 className="text-3xl font-bold mb-6">
-              🥷 Current Queue
-            </h2>
-
-            <Queue />
-          </div>
-
+          {/* Join Battle */}
           <div
             id="join"
-            className="bg-gray-900/90 rounded-3xl border border-orange-500/30 p-8"
+            className="order-1 lg:order-2 bg-gray-900/90 rounded-3xl border border-orange-500/30 p-6 md:p-8"
           >
-            <h2 className="text-3xl font-bold mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">
               ⚔ Join the Battle
             </h2>
 
@@ -49,10 +44,20 @@ export default async function Home() {
 
                 <p className="mt-3 text-gray-400">
                   The queue is currently closed.
+                  <br />
                   Come back soon!
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Queue */}
+          <div className="order-2 lg:order-1 bg-gray-900/90 rounded-3xl border border-orange-500/30 p-6 md:p-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">
+              🥷 Current Queue
+            </h2>
+
+            <Queue />
           </div>
 
         </div>
