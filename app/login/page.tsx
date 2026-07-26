@@ -1,16 +1,9 @@
-import { login } from "@/app/actions/login";
+import { signIn } from "@/auth";
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
-  const params = await searchParams;
-
+export default function LoginPage() {
   return (
     <main className="min-h-screen bg-[#0B0F19] flex items-center justify-center text-white">
       <div className="bg-gray-900 p-10 rounded-3xl w-full max-w-md border border-orange-500/30">
-
         <h1 className="text-4xl font-black mb-2 text-center">
           🏯 Hokage Office
         </h1>
@@ -19,18 +12,23 @@ export default async function LoginPage({
           Admin Login
         </p>
 
-        {params.error && (
-          <p className="text-red-400 mb-6 text-center">
-            Invalid username or password.
-          </p>
-        )}
+        <form
+          action={async (formData) => {
+            "use server";
 
-        <form action={login} className="space-y-5">
-
+            await signIn("credentials", {
+              username: formData.get("username"),
+              password: formData.get("password"),
+              redirectTo: "/admin",
+            });
+          }}
+          className="space-y-5"
+        >
           <input
             name="username"
             placeholder="Username"
             className="w-full rounded-xl bg-gray-800 p-3"
+            required
           />
 
           <input
@@ -38,6 +36,7 @@ export default async function LoginPage({
             type="password"
             placeholder="Password"
             className="w-full rounded-xl bg-gray-800 p-3"
+            required
           />
 
           <button
@@ -46,9 +45,7 @@ export default async function LoginPage({
           >
             Login
           </button>
-
         </form>
-
       </div>
     </main>
   );
