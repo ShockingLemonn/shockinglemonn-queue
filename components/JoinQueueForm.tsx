@@ -1,62 +1,64 @@
 "use client";
-import {joinQueue} from "@/app/actions/joinQueue";
+
+import { joinQueue } from "@/app/actions/joinQueue";
+
 export default function JoinQueueForm() {
-return (
-<div className="bg-gray-900 rounded-xl p-6 mt-8">
-<h2 className="text-2xl font-bold mb-6">
-Join the Queue
-</h2>
+  return (
+    <form action={joinQueue} className="space-y-6">
 
-<form action={joinQueue} className="space-y-4">
+      {/* Username */}
+      <div>
+        <label className="block mb-2 text-sm uppercase tracking-wide text-orange-400 font-semibold">
+          🥷 Shinobi Name
+        </label>
 
-<div>
-<label className="block mb-2">
-Shinobi Name
-</label>
+        <input
+          name="username"
+          type="text"
+          placeholder="Enter your username"
+          className="w-full rounded-2xl border border-gray-700 bg-gray-800 px-5 py-4 text-lg text-white outline-none transition-all duration-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30"
+          required
+        />
+      </div>
 
-<input
-name="username"
-type="text"
-className="w-full p-3 rounded bg-gray-800 border border-gray-700"
-placeholder="Enter your username"
-/>
-</div>
+      {/* Platform */}
+      <div>
+        <label className="block mb-2 text-sm uppercase tracking-wide text-orange-400 font-semibold">
+          🎮 Platform
+        </label>
 
-<div>
-<label className="block mb-2">
-Platform
-</label>
+        <select
+          name="platform"
+          className="w-full rounded-2xl border border-gray-700 bg-gray-800 px-5 py-4 text-lg text-white outline-none transition-all duration-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30"
+        >
+          <option>Twitch</option>
+          <option>YouTube</option>
+          <option>TikTok</option>
+        </select>
+      </div>
 
-<select
-name="platform"
-className="w-full p-3 rounded bg-gray-800 border border-gray-700"
->
-<option>Twitch</option>
-<option>YouTube</option>
-<option>TikTok</option>
-</select>
-</div>
+      {/* Discord */}
+      <div>
+        <label className="block mb-2 text-sm uppercase tracking-wide text-orange-400 font-semibold">
+          💬 Discord (Optional)
+        </label>
 
-<div>
-<label className="block mb-2">
-Discord (Optional)
-</label>
+        <input
+          name="discord"
+          type="text"
+          placeholder="Username#1234"
+          className="w-full rounded-2xl border border-gray-700 bg-gray-800 px-5 py-4 text-lg text-white outline-none transition-all duration-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/30"
+        />
+      </div>
 
-<input
-name="discord"
-type="text"
-className="w-full p-3 rounded bg-gray-800 border border-gray-700"
-placeholder="Discord username"
-/>
-</div>
+      {/* Button */}
+      <button
+        type="submit"
+        className="w-full rounded-2xl bg-orange-500 py-4 text-xl font-black text-white transition-all duration-200 hover:bg-orange-400 hover:scale-[1.02] active:scale-95 shadow-lg shadow-orange-500/20"
+      >
+        ⚔ JOIN THE BATTLE
+      </button>
 
-<button
-className="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-bold"
->
-Join Queue
-</button>
-
-</form>
-</div>
-);
+    </form>
+  );
 }
