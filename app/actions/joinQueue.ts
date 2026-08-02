@@ -13,7 +13,7 @@ export async function joinQueue(formData: FormData) {
     return;
   }
 
-  // Check all active players (waiting or playing)
+  // Get all active players (waiting or playing)
   const { data: players, error: lookupError } = await supabase
     .from("players")
     .select("id, username, status")
@@ -24,14 +24,25 @@ export async function joinQueue(formData: FormData) {
     return;
   }
 
+  // Count waiting players
+  const waitingPlayers =
+    players?.filter((player) => player.status === "waiting") ?? [];
+
+  if (waitingPlayers.length >= 10) {
+    console.log("Queue is full.");
+    return;
+  }
+
+  // Check for duplicate username (case-insensitive)
   const duplicate = players?.find(
     (player) =>
       player.username.trim().toLowerCase() === username.toLowerCase()
   );
 
   if (duplicate) {
-  throw new Error("⚠️ You're already in the queue!");
-}
+    console.log(`${username} is already in the queue.`);
+    return;
+  }
 
   const { error } = await supabase.from("players").insert([
     {
@@ -40,6 +51,7 @@ export async function joinQueue(formData: FormData) {
       discord,
       matches_remaining: 3,
       status: "waiting",
+      skips: 0,
     },
   ]);
 
