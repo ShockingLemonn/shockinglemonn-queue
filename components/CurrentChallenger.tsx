@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { streamerWon } from "@/app/actions/streamerWon";
+import { opponentWon } from "@/app/actions/opponentWon";
+
 export default async function CurrentChallenger() {
   const { data: player, error } = await supabase
     .from("players")
@@ -51,14 +53,26 @@ export default async function CurrentChallenger() {
         <p>
           <strong>Status:</strong> 🟢 Playing
         </p>
-        <form action={streamerWon} className="pt-4">
-  <button
-    type="submit"
-    className="bg-green-600 hover:bg-green-700 px-5 py-2 rounded-lg font-bold"
-  >
-    🏆 Streamer Won
-  </button>
-</form>
+
+        <div className="flex flex-wrap gap-3 pt-4">
+          <form action={streamerWon}>
+            <button
+              type="submit"
+              className="bg-green-600 hover:bg-green-700 px-5 py-2 rounded-lg font-bold"
+            >
+              🏆 Streamer Won
+            </button>
+          </form>
+
+          <form action={opponentWon}>
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg font-bold"
+            >
+              🥷 Opponent Won
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
