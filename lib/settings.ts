@@ -13,3 +13,24 @@ export async function getSetting(key: string) {
 
   return data.value;
 }
+
+export async function setSetting(key: string, value: string) {
+  const { error } = await supabase
+    .from("settings")
+    .upsert(
+      {
+        key,
+        value,
+      },
+      {
+        onConflict: "key",
+      }
+    );
+
+  if (error) {
+    console.error(`Failed to update setting "${key}":`, error);
+    return false;
+  }
+
+  return true;
+}

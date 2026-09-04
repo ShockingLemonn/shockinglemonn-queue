@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
 import { supabase } from "@/lib/supabase";
 
 export async function startMatch() {
@@ -19,7 +20,11 @@ export async function startMatch() {
 
   const { data, error: updateError } = await supabase
     .from("players")
-    .update({ status: "playing" })
+    .update({
+      status: "playing",
+      streamer_score: 0,
+      opponent_score: 0,
+    })
     .eq("id", player.id)
     .select();
 
