@@ -26,7 +26,7 @@ export default function LiveScoreboard({
   }, [player]);
 
   useEffect(() => {
-    let switchTimer: ReturnType<typeof setTimeout> | null = null;
+    let clearTimer: ReturnType<typeof setTimeout> | null = null;
 
     const channel = supabase
       .channel("overlay-scoreboard")
@@ -40,14 +40,16 @@ export default function LiveScoreboard({
         (payload) => {
           // Player was deleted after finishing their set.
           if (payload.eventType === "DELETE") {
-            if (switchTimer) {
-              clearTimeout(switchTimer);
+            if (clearTimer) {
+              clearTimeout(clearTimer);
             }
 
-            switchTimer = setTimeout(() => {
+            // Keep the final score visible briefly if there is
+            // no next challenger.
+            clearTimer = setTimeout(() => {
               setPlayer(null);
               playerRef.current = null;
-            }, 5000);
+            }, 1500);
 
             return;
           }
@@ -59,19 +61,18 @@ export default function LiveScoreboard({
             return;
           }
 
+          // A new player update means we have a current challenger.
+          if (clearTimer) {
+            clearTimeout(clearTimer);
+            clearTimer = null;
+          }
+
           const currentPlayer = playerRef.current;
 
-          // A new challenger has entered the match.
+          // New challenger.
           if (currentPlayer && newPlayer.id !== currentPlayer.id) {
-            if (switchTimer) {
-              clearTimeout(switchTimer);
-            }
-
-            switchTimer = setTimeout(() => {
-              setPlayer(newPlayer);
-              playerRef.current = newPlayer;
-            }, 5000);
-
+            setPlayer(newPlayer);
+            playerRef.current = newPlayer;
             return;
           }
 
@@ -83,17 +84,21 @@ export default function LiveScoreboard({
       .subscribe();
 
     return () => {
-      if (switchTimer) {
-        clearTimeout(switchTimer);
+      if (clearTimer) {
+        clearTimeout(clearTimer);
       }
 
       supabase.removeChannel(channel);
     };
   }, []);
 
-  const matchNumber = player
-    ? 3 - player.matches_remaining + 1
-    : null;
+  // Calculate the current game number from the number of games
+  // already played. Never allow it to display higher than 3.
+  const gamesPlayed =
+    (player?.streamer_score ?? 0) +
+    (player?.opponent_score ?? 0);
+
+  const matchNumber = Math.min(gamesPlayed + 1, 3);
 
   return (
     <>
@@ -186,10 +191,10 @@ export default function LiveScoreboard({
 
           {/* MATCH COUNTER */}
           {player && (
-            <div className="mt-3 flex justify-center">
-              <div className="border border-white/20 bg-black/80 px-6 py-1.5">
-                <span className="text-xs font-bold uppercase tracking-[0.35em] text-gray-300">
-                  Match {matchNumber} / 3
+            <div className="relative -mt-1 flex justify-center">
+              <div className="border-2 border-white/40 bg-black/95 px-5 py-1.5">
+                <span className="text-sm font-black uppercase tracking-[0.25em] text-white">
+                  MATCH {matchNumber} / 3
                 </span>
               </div>
             </div>

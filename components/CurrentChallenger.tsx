@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { streamerWon } from "@/app/actions/streamerWon";
 import { opponentWon } from "@/app/actions/opponentWon";
+import RemoveCurrentPlayerButton from "@/components/RemoveCurrentPlayerButton";
 
 export default async function CurrentChallenger() {
   const { data: player, error } = await supabase
@@ -72,6 +73,8 @@ export default async function CurrentChallenger() {
               🥷 Opponent Won
             </button>
           </form>
+
+          <RemoveCurrentPlayerButton />
         </div>
       </div>
     </div>

@@ -18,13 +18,14 @@ export async function streamerWon() {
   const streamerScore = (player.streamer_score ?? 0) + 1;
   const matchesRemaining = player.matches_remaining - 1;
 
-  // Challenger has finished all of their matches
+  // Challenger has finished all of their matches.
   if (matchesRemaining <= 0) {
-    // Save the final score and mark the player as finished.
+    // Save the FINAL score while the player is still "playing".
+    // This makes the Realtime update behave exactly like
+    // every other score update.
     const { error: finishError } = await supabase
       .from("players")
       .update({
-        status: "finished",
         matches_remaining: 0,
         streamer_score: streamerScore,
       })
@@ -39,13 +40,18 @@ export async function streamerWon() {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Remove the finished challenger.
-    await supabase
+    const { error: deleteError } = await supabase
       .from("players")
       .delete()
       .eq("id", player.id);
 
-    // Start the next challenger.
-    const { data: nextPlayer } = await supabase
+    if (deleteError) {
+      console.error("DELETE ERROR:", deleteError);
+      return;
+    }
+
+    // Find the next challenger.
+    const { data: nextPlayer, error: nextError } = await supabase
       .from("players")
       .select("*")
       .eq("status", "waiting")
@@ -53,8 +59,14 @@ export async function streamerWon() {
       .limit(1)
       .maybeSingle();
 
+    if (nextError) {
+      console.error("NEXT PLAYER ERROR:", nextError);
+      return;
+    }
+
+    // Start the next challenger.
     if (nextPlayer) {
-      await supabase
+      const { error: startError } = await supabase
         .from("players")
         .update({
           status: "playing",
@@ -62,16 +74,25 @@ export async function streamerWon() {
           opponent_score: 0,
         })
         .eq("id", nextPlayer.id);
+
+      if (startError) {
+        console.error("START NEXT PLAYER ERROR:", startError);
+      }
     }
   } else {
     // Normal game.
-    await supabase
+    const { error: updateError } = await supabase
       .from("players")
       .update({
         matches_remaining: matchesRemaining,
         streamer_score: streamerScore,
       })
       .eq("id", player.id);
+
+    if (updateError) {
+      console.error("UPDATE ERROR:", updateError);
+      return;
+    }
   }
 
   revalidatePath("/");
